@@ -1,0 +1,1 @@
+{"type":"module","private":true,"name":"urban-resilience","scripts":{"check":"node scripts/check_model.mjs","start":"python3 -m http.server 8000"}}

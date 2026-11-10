@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resilience Investment Atlas, Miami-Dade</title>
+<meta name="description" content="Proof of concept: where a dollar of climate adaptation returns the most across Miami-Dade.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 1h8l4 7-4 7H4L0 8z' fill='%23e3a93c'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-name">Resilience Investment Atlas</span>
+    <span class="brand-place">Miami-Dade</span>
+  </div>
+  <div class="status-pill" id="statusPill"><i></i><span>Proof of concept, illustrative data</span></div>
+  <button class="ghost-btn" id="aboutBtn" type="button">How the numbers work</button>
+</header>
+
+<main class="shell">
+  <aside class="panel" aria-label="Analysis">
+    <nav class="tabs" id="tabs" aria-label="Views"></nav>
+
+    <section class="scenario" aria-label="Scenario">
+      <div class="field">
+        <span class="field-label">Sea level in</span>
+        <div class="seg" id="yearSeg" role="group" aria-label="Scenario year"></div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="rate">Discount rate <output id="rateOut"></output></label>
+        <input type="range" id="rate" min="2" max="8" step="0.5">
+      </div>
+      <div class="field">
+        <span class="field-label">Over</span>
+        <div class="seg" id="horizonSeg" role="group" aria-label="Appraisal period"></div>
+      </div>
+    </section>
+
+    <div class="panel-scroll" id="panelScroll">
+      <section class="card intro">
+        <h1 id="viewTitle"></h1>
+        <p id="viewText"></p>
+      </section>
+      <section class="card legend" id="legend" aria-live="polite"></section>
+      <section id="viewBody"></section>
+    </div>
+  </aside>
+
+  <section class="map-wrap">
+    <div id="map" aria-label="Map of Miami-Dade"></div>
+    <div class="map-tools">
+      <div class="seg" id="baseSeg" role="group" aria-label="Basemap"></div>
+      <button class="tool-btn" id="tiltBtn" type="button" aria-pressed="false">Tilt</button>
+      <button class="tool-btn" id="resetBtn" type="button">Whole county</button>
+    </div>
+    <div class="map-toast" id="toast" hidden></div>
+    <div class="hover-tip" id="tip" hidden></div>
+    <article class="detail" id="detail" hidden></article>
+  </section>
+</main>
+
+<dialog class="about" id="about">
+  <h2>How the numbers work</h2>
+  <p>The county is divided into hexagonal cells of about 0.1 km². For each cell the model estimates the yearly loss from four hazards, then tests five adaptation measures and keeps the one with the highest net present value.</p>
+  <ul>
+    <li><b>Expected yearly loss</b> is property damage, days of lost business, the knock-on loss to the wider economy when a critical cell stops, and heat costs to households and employers.</li>
+    <li><b>Return</b> is the present value of avoided losses divided by the capital cost plus upkeep, over the period and discount rate you set.</li>
+    <li><b>Tax base protected</b> is shown separately and is not counted in the return.</li>
+  </ul>
+  <p class="warn">This is a proof of concept. The geography is hand-drawn, the data is synthetic and the coefficients are placeholders. It shows what the tool does, not what Miami should build.</p>
+  <form method="dialog"><button class="ghost-btn" type="submit">Close</button></form>
+</dialog>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script src="vendor/h3-js.umd.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
