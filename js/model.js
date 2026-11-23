@@ -28,35 +28,35 @@ export const HAZARDS = {
 // capex: capital cost in $M for one hex cell.
 export const INTERVENTIONS = [
   {
-    id: 'shoreline', label: 'Shoreline protection', color: '#4aa8d8',
+    id: 'shoreline', label: 'Shoreline protection', color: '#2b7bba',
     note: 'Raised seawalls with living shoreline. Cells within 1.2 km of the bay.',
     eligible: (h) => h.dc < 1.2,
     reduce: { coast: 0.6 },
     capex: (h) => 6.5 + 0.012 * h.val,
   },
   {
-    id: 'drainage', label: 'Stormwater upgrade', color: '#7c8cf0',
+    id: 'drainage', label: 'Stormwater upgrade', color: '#4fb3bf',
     note: 'Larger drains, pumps and retention.',
     eligible: () => true,
     reduce: { rain: 0.55, coast: 0.1 },
     capex: (h) => 1.9 * (0.5 + h.imp),
   },
   {
-    id: 'elevate', label: 'Elevate and floodproof', color: '#c58be0',
+    id: 'elevate', label: 'Elevate and floodproof', color: '#9d7652',
     note: 'Raise or floodproof buildings and critical equipment.',
     eligible: () => true,
     reduce: { coast: 0.45, rain: 0.35 },
     capex: (h) => 0.035 * h.val,
   },
   {
-    id: 'wind', label: 'Wind retrofit', color: '#e9c46a',
+    id: 'wind', label: 'Wind retrofit', color: '#7a8085',
     note: 'Roof ties, impact windows and doors on older stock.',
     eligible: () => true,
     reduce: { wind: 0.45 },
     capex: (h, c) => 0.028 * h.val * c.windVuln,
   },
   {
-    id: 'cooling', label: 'Cool roofs and canopy', color: '#5fbf8f',
+    id: 'cooling', label: 'Cool roofs and canopy', color: '#52b788',
     note: 'Reflective roofs and street trees.',
     eligible: () => true,
     reduce: { heat: 0.4, rain: 0.08 },

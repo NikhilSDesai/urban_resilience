@@ -19,10 +19,10 @@ const years = (v) => (Number.isFinite(v) && v < 99 ? `${v.toFixed(v < 10 ? 1 : 0
 
 // ---- Colour ramps -----------------------------------------------------------
 const RAMPS = {
-  hazard: ['#17120f', '#4a1512', '#8f1d18', '#d02a22', '#ff5a3c'],
-  money: ['#15130f', '#4a3410', '#8f6417', '#d39a2c', '#ffd772'],
-  people: ['#10141a', '#1c3350', '#2b5f93', '#4a97cf', '#a6dcff'],
-  gain: ['#0e1614', '#0f3b33', '#16705c', '#2fb692', '#8ff5d0'],
+  hazard: ['#fff5f0', '#fcbba1', '#fc8d59', '#e34a33', '#b30000'],  // Light to dark red: low to high risk
+  money: ['#f7fcf5', '#c7e9c0', '#74c476', '#31a354', '#006d2c'],   // Light to dark green: low to high value
+  people: ['#f7f4f9', '#d4b9da', '#c994c7', '#df65b0', '#ce1256'],  // Light to dark purple: demographics
+  gain: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],    // Light to dark green: low to high returns
 };
 const hex2rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 const RAMP_RGB = Object.fromEntries(Object.entries(RAMPS).map(([k, v]) => [k, v.map(hex2rgb)]));
@@ -175,10 +175,10 @@ const BODY = {
     </div>
     <div class="card" style="margin-top:10px"><h2>What the yearly loss is made of</h2>
       ${stackBar([
-        { label: 'Property damage', v: t.propLoss, color: '#e3a93c' },
-        { label: 'Lost business days', v: t.biLoss, color: '#4a97cf' },
-        { label: 'Knock-on regional loss', v: t.cascadeLoss, color: '#c58be0' },
-        { label: 'Heat costs', v: t.heatLoss, color: '#e5352c' },
+        { label: 'Property damage', v: t.propLoss, color: '#a0754d' },      // Brown: buildings/structures
+        { label: 'Lost business days', v: t.biLoss, color: '#3b82c4' },     // Blue: business/economic activity
+        { label: 'Knock-on regional loss', v: t.cascadeLoss, color: '#d63447' },  // Red: systemic risk
+        { label: 'Heat costs', v: t.heatLoss, color: '#ff6b35' },           // Orange: heat/temperature
       ])}</div>
     <div class="card" style="margin-top:10px"><h2>${num(t.funded)} of ${num(t.cells)} cells have a measure that pays back</h2>
       <p class="hint">${money(t.value)} of property, ${big(t.pop)} residents and ${big(t.jobs)} jobs are in the model.</p></div>`;
@@ -220,7 +220,7 @@ const BODY = {
       return item(m.id, m.label, `${m.note} ${sub}`, m.color);
     }).join('') : '';
     const mixCount = Object.values(bm).reduce((s, x) => s + x.cells, 0);
-    return `<ul class="tree">${item('best', 'Best-paying measure in each cell', `${num(mixCount)} cells funded across all five measures.`, 'linear-gradient(135deg,#4aa8d8,#5fbf8f)')}${all}</ul>`;
+    return `<ul class="tree">${item('best', 'Best-paying measure in each cell', `${num(mixCount)} cells funded across all five measures.`, 'linear-gradient(135deg,#2b7bba,#52b788)')}${all}</ul>`;
   },
   returns() {
     const t = summary.tot, v = (x) => `<span class="val">${x}</span>`;
@@ -228,9 +228,9 @@ const BODY = {
         ${row('payback', 'Payback period')}${row('capex', 'Capital needed', v(money(t.capex)))}${row('taxPV', 'Property tax protected', v(money(t.taxPV)))}</ul>
       <div class="card" style="margin-top:10px"><h2>Who captures the ${money(t.avoided)} avoided each year</h2>
         ${stackBar([
-          { label: 'Property owners and insurers', v: t.owners, color: '#e3a93c' },
-          { label: 'Employers', v: t.business, color: '#4a97cf' },
-          { label: 'Households', v: t.households, color: '#3fcfa6' },
+          { label: 'Property owners and insurers', v: t.owners, color: '#a0754d' },   // Brown: property/real estate
+          { label: 'Employers', v: t.business, color: '#3b82c4' },                     // Blue: business/commercial
+          { label: 'Households', v: t.households, color: '#7b68a8' },                  // Purple: residential/people
         ])}
         <p class="hint" style="margin-top:10px">Local government would also keep ${money(t.taxPV)} of property tax, in present value, that falling values would otherwise erase. It is not counted in the return.</p></div>`;
   },
@@ -296,8 +296,10 @@ function renderDetail() {
     <dl class="facts"><div><dt>Property</dt><dd>${money(h.val)}</dd></div><div><dt>Residents</dt><dd>${num(h.pop)}</dd></div><div><dt>Jobs</dt><dd>${num(h.jobs)}</dd></div></dl>
     <h3>Expected yearly loss <b>${money(c.eal)}</b></h3>
     ${stackBar([
-      { label: 'Property', v: c.propLoss, color: '#e3a93c' }, { label: 'Business days', v: c.biLoss, color: '#4a97cf' },
-      { label: 'Knock-on', v: c.cascadeLoss, color: '#c58be0' }, { label: 'Heat', v: c.heatLoss, color: '#e5352c' },
+      { label: 'Property', v: c.propLoss, color: '#a0754d' },      // Brown: buildings/structures
+      { label: 'Business days', v: c.biLoss, color: '#3b82c4' },   // Blue: business/economic activity
+      { label: 'Knock-on', v: c.cascadeLoss, color: '#d63447' },   // Red: systemic risk
+      { label: 'Heat', v: c.heatLoss, color: '#ff6b35' },          // Orange: heat/temperature
     ])}
     <div class="verdict"><strong><i class="dot" style="background:${pays ? m.color : NO_RETURN}"></i>${pays ? `${m.label}<small>highest net value</small>` : 'No measure pays back here'}</strong>
       ${pays ? `<p>${money(b.capex)} of capital avoids ${money(b.avoided)} a year. That returns <span class="big">${times(b.bcr)}</span> and pays back in ${years(b.payback)}.</p>`
