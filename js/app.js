@@ -19,10 +19,11 @@ const years = (v) => (Number.isFinite(v) && v < 99 ? `${v.toFixed(v < 10 ? 1 : 0
 
 // ---- Colour ramps -----------------------------------------------------------
 const RAMPS = {
-  hazard: ['#fff5f0', '#fcbba1', '#fc8d59', '#e34a33', '#b30000'],  // Light to dark red: low to high risk
-  money: ['#f7fcf5', '#c7e9c0', '#74c476', '#31a354', '#006d2c'],   // Light to dark green: low to high value
-  people: ['#f7f4f9', '#d4b9da', '#c994c7', '#df65b0', '#ce1256'],  // Light to dark purple: demographics
-  gain: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],    // Light to dark green: low to high returns
+  whiteBlue: ['#ffffff', '#d0e5f5', '#a1cbe8', '#72b1db', '#4397ce'],    // White to blue: overview
+  red: ['#fff5f0', '#fcbba1', '#fc8d59', '#e34a33', '#b30000'],         // Light to dark red: risk
+  blueRed: ['#4397ce', '#7db8d9', '#b8d9e4', '#f4c2a8', '#e34a33'],     // Blue to red: economic exposure
+  whiteGreen: ['#ffffff', '#d4f1d4', '#a8e3a8', '#7dd57d', '#52c752'],  // White to green: ROI
+  people: ['#f7f4f9', '#d4b9da', '#c994c7', '#df65b0', '#ce1256'],      // Purple: demographics
 };
 const hex2rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 const RAMP_RGB = Object.fromEntries(Object.entries(RAMPS).map(([k, v]) => [k, v.map(hex2rgb)]));
@@ -38,33 +39,33 @@ const NO_RETURN = '#3a3c42';
 // get(h, c): h is the cell's inputs, c its model results. null hides the cell.
 const opt = (c) => (state.measure === 'best' ? c.best : c.options[state.measure]);
 const LAYERS = {
-  hazard: { label: 'Combined hazard', unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.hazard },
-  hCoast: { label: HAZARDS.coast, unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.hCoast },
-  hRain: { label: HAZARDS.rain, unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.hRain },
-  hWind: { label: HAZARDS.wind, unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.hWind },
-  hHeat: { label: HAZARDS.heat, unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.hHeat },
-  sensitivity: { label: 'Social sensitivity', unit: 'index 0 to 1', ramp: 'hazard', fmt: idx, get: (h, c) => c.sensitivity },
-  a65: { label: 'Population aged 65+', unit: '% of residents', ramp: 'people', fmt: (v) => `${v.toFixed(0)}%`, get: (h) => h.a65 },
+  hazard: { label: 'Combined hazard', unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.hazard },
+  hCoast: { label: HAZARDS.coast, unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.hCoast },
+  hRain: { label: HAZARDS.rain, unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.hRain },
+  hWind: { label: HAZARDS.wind, unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.hWind },
+  hHeat: { label: HAZARDS.heat, unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.hHeat },
+  sensitivity: { label: 'Social sensitivity', unit: 'index 0 to 1', ramp: 'red', fmt: idx, get: (h, c) => c.sensitivity },
+  a65: { label: 'Population aged 65+', unit: '% of residents', ramp: 'red', fmt: (v) => `${v.toFixed(0)}%`, get: (h) => h.a65 },
   inc: { label: 'Household income', unit: '$ thousand, median', ramp: 'people', fmt: (v) => `$${v.toFixed(0)}K`, get: (h) => h.inc },
-  yb: { label: 'Typical year built', unit: 'year', ramp: 'people', fmt: (v) => v.toFixed(0), get: (h) => h.yb },
+  yb: { label: 'Typical year built', unit: 'year', ramp: 'red', fmt: (v) => v.toFixed(0), get: (h) => h.yb },
   el: { label: 'Ground elevation', unit: 'metres', ramp: 'people', fmt: (v) => `${v.toFixed(1)} m`, get: (h) => h.el },
   imp: { label: 'Hard surface cover', unit: 'share of land', ramp: 'people', fmt: idx, get: (h) => h.imp },
-  can: { label: 'Tree canopy', unit: 'share of land', ramp: 'gain', fmt: idx, get: (h) => h.can },
-  val: { label: 'Property value', unit: 'per cell', ramp: 'money', fmt: money, get: (h) => h.val },
-  jobs: { label: 'Jobs', unit: 'per cell', ramp: 'people', fmt: num, get: (h) => h.jobs },
-  pop: { label: 'Residents', unit: 'per cell', ramp: 'people', fmt: num, get: (h) => h.pop },
-  crit: { label: 'Network criticality', unit: 'index 0 to 1', ramp: 'money', fmt: idx, get: (h) => h.crit },
-  eal: { label: 'Expected yearly loss', unit: 'per cell', ramp: 'money', fmt: money, get: (h, c) => c.eal },
-  ealPct: { label: 'Yearly loss as a share of value', unit: '%', ramp: 'money', fmt: (v) => `${v.toFixed(1)}%`, get: (h, c) => c.ealPct },
-  propLoss: { label: 'Property damage', unit: 'per year', ramp: 'money', fmt: money, get: (h, c) => c.propLoss },
-  biLoss: { label: 'Lost business days', unit: 'per year', ramp: 'money', fmt: money, get: (h, c) => c.biLoss },
-  cascadeLoss: { label: 'Knock-on loss to the region', unit: 'per year', ramp: 'money', fmt: money, get: (h, c) => c.cascadeLoss },
+  can: { label: 'Tree canopy', unit: 'share of land', ramp: 'whiteGreen', fmt: idx, get: (h) => h.can },
+  val: { label: 'Property value', unit: 'per cell', ramp: 'blueRed', fmt: money, get: (h) => h.val },
+  jobs: { label: 'Jobs', unit: 'per cell', ramp: 'blueRed', fmt: num, get: (h) => h.jobs },
+  pop: { label: 'Residents', unit: 'per cell', ramp: 'blueRed', fmt: num, get: (h) => h.pop },
+  crit: { label: 'Network criticality', unit: 'index 0 to 1', ramp: 'blueRed', fmt: idx, get: (h) => h.crit },
+  eal: { label: 'Expected yearly loss', unit: 'per cell', ramp: 'whiteBlue', fmt: money, get: (h, c) => c.eal },
+  ealPct: { label: 'Yearly loss as a share of value', unit: '%', ramp: 'blueRed', fmt: (v) => `${v.toFixed(1)}%`, get: (h, c) => c.ealPct },
+  propLoss: { label: 'Property damage', unit: 'per year', ramp: 'blueRed', fmt: money, get: (h, c) => c.propLoss },
+  biLoss: { label: 'Lost business days', unit: 'per year', ramp: 'blueRed', fmt: money, get: (h, c) => c.biLoss },
+  cascadeLoss: { label: 'Knock-on loss to the region', unit: 'per year', ramp: 'blueRed', fmt: money, get: (h, c) => c.cascadeLoss },
   best: { label: 'Best-paying measure', categorical: true, get: (h, c) => (c.best.npv > 0 ? c.best.id : 'none') },
-  bcr: { label: 'Return per dollar', unit: 'benefit to cost', ramp: 'gain', fmt: times, get: (h, c) => { const o = opt(c); return o ? o.bcr : null; } },
-  npv: { label: 'Net present value', unit: 'per cell', ramp: 'gain', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.npv : null; } },
-  payback: { label: 'Payback period', unit: 'years, shorter is better', ramp: 'gain', invert: true, fmt: years, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? Math.min(60, o.payback) : null; } },
-  capex: { label: 'Capital needed', unit: 'per cell', ramp: 'money', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.capex : null; } },
-  taxPV: { label: 'Property tax protected', unit: 'present value', ramp: 'gain', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.taxPV : null; } },
+  bcr: { label: 'Return per dollar', unit: 'benefit to cost', ramp: 'whiteGreen', fmt: times, get: (h, c) => { const o = opt(c); return o ? o.bcr : null; } },
+  npv: { label: 'Net present value', unit: 'per cell', ramp: 'whiteGreen', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.npv : null; } },
+  payback: { label: 'Payback period', unit: 'years, shorter is better', ramp: 'whiteGreen', invert: true, fmt: years, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? Math.min(60, o.payback) : null; } },
+  capex: { label: 'Capital needed', unit: 'per cell', ramp: 'blueRed', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.capex : null; } },
+  taxPV: { label: 'Property tax protected', unit: 'present value', ramp: 'whiteGreen', fmt: money, get: (h, c) => { const o = opt(c); return o && o.npv > 0 ? o.taxPV : null; } },
 };
 
 const VIEWS = [
